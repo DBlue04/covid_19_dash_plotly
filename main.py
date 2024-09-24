@@ -52,24 +52,114 @@ list_locations = covid_data_dict.set_index('Country/Region')[['Lat', 'Long']].T.
 #Creating dashboard
 app = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
 app.layout = html.Div([
-    html.Div([
-        html.Div([
-            html.Img(src=app.get_asset_url('assets/corona_1919.png'),
-                     id='corona-image',
-                     style={
-                         'height':'60px',
-                         'width': 'auto',
-                         'margin-bottom':'25px',
-                     },)
-        ], 
-            className='one-third column',
-        ),
+    html.Div([#header
         html.Div([
             html.Div([
-                html.H3('Covid - 19', style={'margin-box': '8px', 'color':'white'}),
-                html.H5('Track Covid - 19 Cases', style={'margin-box':'8px', 'color':'white'}),
+                html.H3("Covid - 19", style={"margin-bottom": "0px", 'color': 'white'}),
+                html.H5("Track Covid - 19 Cases", style={"margin-top": "0px", 'color': 'white'}),
             ])
-        ])
+        ], className="one-half column", id="title"),
+
+        html.Div([
+            html.H6('Last Updated: ' + str(covid_data_1['Date'].iloc[-1].strftime("%B %d, %Y")) + '  00:01 (UTC)',
+                    style={'color': 'orange'}),
+
+        ], className="one-third column", id='title1'),
+
+    ], id="header", className="row flex-display", style={"margin-bottom": "25px"}),
+    html.Div([#card information
+        html.Div([#global cases card
+            html.H6(
+                children='Global cases',
+                style = {'textAlign':'center',
+                         'color': 'white'}
+                    ),
+            html.P(f"{covid_data_1.iloc[-1]['Confirmed']}",
+                    style = {'textAlign':'center',
+                            'color':'orange',
+                            'fontSize':40}
+                    ),
+            html.P(
+                'New: ' + f"{covid_data_1.iloc[-1]['Confirmed'] - covid_data_1.iloc[-2]['Confirmed']}"\
+                      + ' (' + str(round(((covid_data_1['Confirmed'].iloc[-1] - covid_data_1['Confirmed'].iloc[-2])\
+                                           / covid_data_1['Confirmed'].iloc[-1]) * 100, 2)) + '%)',
+                style={
+                       'textAlign': 'center',
+                       'color': 'orange',
+                       'fontSize': 15,
+                       'margin-top': '-18px'}
+                    )
+            ], className = 'card_container three columns',),
+        html.Div([#Global deaths
+            html.H6(children='Global Deaths',
+                    style={
+                        'textAlign':'center',
+                        'color':'white'}),
+            html.P(f"{covid_data_1['Deaths'].iloc[-1]}",
+                   style={'textAlign': 'center',
+                        'color': '#dd1e35',
+                        'fontSize': 40}),
+            html.P('new:  ' + f"{covid_data_1['Deaths'].iloc[-1] - covid_data_1['Deaths'].iloc[-2]} "\
+                   + ' (' + str(round(((covid_data_1['Deaths'].iloc[-1] - covid_data_1['Deaths'].iloc[-2]) / \
+                                       covid_data_1['Deaths'].iloc[-1]) * 100, 2)) + '%)',
+                   style={
+                       'textAlign': 'center',
+                       'color': '#dd1e35',
+                       'fontSize': 15,
+                       'margin-top': '-18px'}
+                   )], className="card_container three columns",),
+        html.Div([#Global Recovered
+            html.H6(children='Global Recovered',
+                    style={'textAlign':'center',
+                           'color':'white'}),
+            html.P(f"{covid_data_1['Recovered'].iloc[-1]:,.0f}",
+                   style={
+                       'textAlign': 'center',
+                       'color': 'green',
+                       'fontSize': 40}
+                   ),
+            html.P('new:  ' + f"{covid_data_1['Recovered'].iloc[-1] - covid_data_1['Recovered'].iloc[-2]:,.0f} "
+                   + ' (' + str(round(((covid_data_1['Recovered'].iloc[-1] - covid_data_1['Recovered'].iloc[-2]) /
+                                       covid_data_1['Recovered'].iloc[-1]) * 100, 2)) + '%)',
+                   style={
+                       'textAlign': 'center',
+                       'color': 'green',
+                       'fontSize': 15,
+                       'margin-top': '-18px'}
+                   )], className="card_container three columns"),
+        html.Div([#Global Active
+            html.H6(children='Global Active',
+                    style={
+                        'textAlign': 'center',
+                        'color': 'white'}
+                    ),
+
+            html.P(f"{covid_data_1['Active'].iloc[-1]:,.0f}",
+                   style={
+                       'textAlign': 'center',
+                       'color': '#e55467',
+                       'fontSize': 40}
+                   ),
+
+            html.P('new:  ' + f"{covid_data_1['Active'].iloc[-1] - covid_data_1['Active'].iloc[-2]:,.0f} "
+                   + ' (' + str(round(((covid_data_1['Active'].iloc[-1] - covid_data_1['Active'].iloc[-2]) /
+                                       covid_data_1['Active'].iloc[-1]) * 100, 2)) + '%)',
+                   style={
+                       'textAlign': 'center',
+                       'color': '#e55467',
+                       'fontSize': 15,
+                       'margin-top': '-18px'}
+                   )], className="card_container three columns"),
+    ], className="row flex-display"),
+    html.Div([
+        html.P('Select country: ', className='fix_label', style={'color':'white'}),
+        dcc.Dropdown(id='w_countries', 
+                     multi=False, 
+                     clearable=True,
+                     value='US',
+                     placeholder='Select Countries',
+                     options = [{'label': c, 'value': c} for c in (covid_data['Country/Region'].unique())],
+                     className= 'dcc_compon'),
     ])
 ])
 
