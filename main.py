@@ -52,7 +52,9 @@ list_locations = covid_data_dict.set_index('Country/Region')[['Lat', 'Long']].T.
 #Creating dashboard
 app = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
 app.layout = html.Div([
-    html.Div([#header
+
+    #####HEADER OF PAGE######
+    html.Div([
         html.Div([
             html.Div([
                 html.H3("Covid - 19", style={"margin-bottom": "0px", 'color': 'white'}),
@@ -67,8 +69,12 @@ app.layout = html.Div([
         ], className="one-third column", id='title1'),
 
     ], id="header", className="row flex-display", style={"margin-bottom": "25px"}),
-    html.Div([#card information
-        html.Div([#global cases card
+
+    #####ROW INFORMATION 1#####
+    html.Div([
+
+        ###global cases card###
+        html.Div([
             html.H6(
                 children='Global cases',
                 style = {'textAlign':'center',
@@ -90,7 +96,9 @@ app.layout = html.Div([
                        'margin-top': '-18px'}
                     )
             ], className = 'card_container three columns',),
-        html.Div([#Global deaths
+
+        ###Global deaths###
+        html.Div([
             html.H6(children='Global Deaths',
                     style={
                         'textAlign':'center',
@@ -108,7 +116,9 @@ app.layout = html.Div([
                        'fontSize': 15,
                        'margin-top': '-18px'}
                    )], className="card_container three columns",),
-        html.Div([#Global Recovered
+
+        ###Global Recovered###
+        html.Div([
             html.H6(children='Global Recovered',
                     style={'textAlign':'center',
                            'color':'white'}),
@@ -127,7 +137,9 @@ app.layout = html.Div([
                        'fontSize': 15,
                        'margin-top': '-18px'}
                    )], className="card_container three columns"),
-        html.Div([#Global Active
+
+        ###Global Active###
+        html.Div([
             html.H6(children='Global Active',
                     style={
                         'textAlign': 'center',
@@ -151,17 +163,69 @@ app.layout = html.Div([
                        'margin-top': '-18px'}
                    )], className="card_container three columns"),
     ], className="row flex-display"),
+
+    #####ROW INFORMATION 2#####
     html.Div([
-        html.P('Select country: ', className='fix_label', style={'color':'white'}),
-        dcc.Dropdown(id='w_countries', 
-                     multi=False, 
-                     clearable=True,
-                     value='US',
-                     placeholder='Select Countries',
-                     options = [{'label': c, 'value': c} for c in (covid_data['Country/Region'].unique())],
-                     className= 'dcc_compon'),
-    ])
-])
+        #### Dropdown to choose 1 country####
+        html.Div([
+            html.P('Select country: ', className='fix_label', style={'color':'white'}),
+
+            dcc.Dropdown(id='w_countries', 
+                multi=False, #only one country can be chosen per time
+                clearable=False,# allow us clear previous work
+                value='Vietnam', #default value
+                placeholder='Select Countries',
+                options = [{'label': c, 'value': c} for c in (covid_data['Country/Region'].unique())],
+                className= 'dcc_compon'),
+
+            html.P('New Cases of ' + '  ' + ' ' + str(covid_data_2['Date'].iloc[-1].strftime("%B %d, %Y")) + '  ', 
+                className='fix_label',  
+                style={'color': 'white', 'text-align': 'center'}),
+            
+            dcc.Graph(id='confirmed', 
+                    config={'displayModeBar': False},
+                    className = 'dcc_compon',
+                    style={'margin-top':'20px'}),
+            
+
+            dcc.Graph(id='deaths',
+                    config={'displayModeBar':False},
+                    className='dcc_compon',
+                    style={'margin-top':'20px'}),
+
+            dcc.Graph(id='recovered',
+                    config={'displayModeBar':False},
+                    className='dcc_compon',
+                    style={'margin-top':'20px'}),
+
+            dcc.Graph(id='active',
+                    config={'displayModeBar':False},
+                    className='dcc_compon',
+                    style={'margin-top':'20px'})
+        ], className="create_container three columns", id="cross-filter-options"),
+
+        ###Pie chart###
+        html.Div([
+            dcc.Graph(id='pie_chart',
+                    config={'displayModeBar': 'hover',}),
+        ], className="create_container four columns"),
+
+        ###Line charts###
+        html.Div([
+            dcc.Graph(id='line_chart')
+        ], className='create_container five columns')
+    ], className='row flex-display'),
+
+    ###ROW INFORMATION 3###
+    html.Div([
+        html.Div([
+            dcc.Graph(id='map')
+        ], className='create_container1 twelve columns')
+    ], className="row flex-display")
+
+], id='mainContainer', style={"display": "flex", "flex-direction": "column"})
+
+        
 
 # Deploy web
 if __name__ == '__main__':
