@@ -225,7 +225,12 @@ app.layout = html.Div([
 
 ], id='mainContainer', style={"display": "flex", "flex-direction": "column"})
 
-        
+@app.callback(
+    Output('confirmed', 'figure'),
+    [Input('w_countries','value')]
+)  
+def update_country(w_countries):
+    
 
 # Deploy web
 if __name__ == '__main__':
