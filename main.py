@@ -225,13 +225,48 @@ app.layout = html.Div([
 
 ], id='mainContainer', style={"display": "flex", "flex-direction": "column"})
 
+
+#confirmed
 @app.callback(
     Output('confirmed', 'figure'),
-    [Input('w_countries','value')]
+    Input('w_countries','value')
 )  
 def update_country(w_countries):
-    
 
+    #Fomular: total recent confirms - total previous confirms
+    value_confirmed = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-1]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-2]
+    #Fomular: total previous confirms - total 2 last days confirms
+    delta_confirmed = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-2]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-3]
+    return {
+            'data': [go.Indicator(
+                    mode='number+delta',
+                    value=value_confirmed,
+                    delta={'reference': delta_confirmed,
+                              'position': 'right',
+                              'valueformat': ',g',
+                              'relative': False,
+
+                              'font': {'size': 15}},
+                    number={'valueformat': ',',
+                            'font': {'size': 20},
+
+                               },
+                    domain={'y': [0, 1], 'x': [0, 1]})],
+            'layout': go.Layout(
+                title={'text': 'New Confirmed',
+                       'y': 1,
+                       'x': 0.5,
+                       'xanchor': 'center',
+                       'yanchor': 'top'},
+                font=dict(color='orange'),
+                paper_bgcolor='#1f2c56',
+                plot_bgcolor='#1f2c56',
+                height=50
+                ),
+
+            }
 # Deploy web
 if __name__ == '__main__':
     app.run_server()
