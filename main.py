@@ -170,6 +170,7 @@ app.layout = html.Div([
         html.Div([
             html.P('Select country: ', className='fix_label', style={'color':'white'}),
 
+            #Choosing country
             dcc.Dropdown(id='w_countries', 
                 multi=False, #only one country can be chosen per time
                 clearable=False,# allow us clear previous work
@@ -178,10 +179,12 @@ app.layout = html.Div([
                 options = [{'label': c, 'value': c} for c in (covid_data['Country/Region'].unique())],
                 className= 'dcc_compon'),
 
+            #Title for updated date
             html.P('New Cases of ' + '  ' + ' ' + str(covid_data_2['Date'].iloc[-1].strftime("%B %d, %Y")) + '  ', 
                 className='fix_label',  
                 style={'color': 'white', 'text-align': 'center'}),
             
+            #Information of confirm
             dcc.Graph(id='confirmed', 
                     config={'displayModeBar': False},
                     className = 'dcc_compon',
@@ -239,21 +242,23 @@ def update_country(w_countries):
     #Fomular: total previous confirms - total 2 last days confirms
     delta_confirmed = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-2]\
          - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-3]
+    
     return {
+            #Data#
             'data': [go.Indicator(
-                    mode='number+delta',
+                    mode='number + delta',
                     value=value_confirmed,
                     delta={'reference': delta_confirmed,
                               'position': 'right',
                               'valueformat': ',g',
                               'relative': False,
-
                               'font': {'size': 15}},
                     number={'valueformat': ',',
                             'font': {'size': 20},
-
                                },
                     domain={'y': [0, 1], 'x': [0, 1]})],
+            
+            #Layout
             'layout': go.Layout(
                 title={'text': 'New Confirmed',
                        'y': 1,
@@ -267,6 +272,180 @@ def update_country(w_countries):
                 ),
 
             }
+
+
+#Death
+@app.callback(
+    Output('deaths', 'figure'),
+    Input('w_countries','value')
+)  
+def update_country(w_countries):
+    value = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Deaths'].iloc[-1]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Deaths'].iloc[-2]
+
+    delta = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Deaths'].iloc[-2]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Deaths'].iloc[-3]
+    
+    return {
+            'data': [go.Indicator(
+                    mode='number+delta',
+                    value=value,
+                    delta={'reference': delta,
+                              'position': 'right',
+                              'valueformat': ',g',
+                              'relative': False,
+
+                              'font': {'size': 15}},
+                    number={'valueformat': ',',
+                            'font': {'size': 20},
+
+                               },
+                    domain={'y': [0, 1], 'x': [0, 1]})],
+            'layout': go.Layout(
+                title={'text': 'New Death',
+                       'y': 1,
+                       'x': 0.5,
+                       'xanchor': 'center',
+                       'yanchor': 'top'},
+                font=dict(color='#dd1e35'),
+                paper_bgcolor='#1f2c56',
+                plot_bgcolor='#1f2c56',
+                height=50
+                ),
+
+            }
+
+#Recovered
+@app.callback(
+    Output('recovered', 'figure'),
+    Input('w_countries','value')
+)  
+def update_country(w_countries):
+    value_recovered = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Recovered'].iloc[-1]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Recovered'].iloc[-2]
+
+    delta_recovered = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Recovered'].iloc[-2]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Recovered'].iloc[-3]
+    
+    return {
+            'data': [go.Indicator(
+                    mode='number+delta',
+                    value=value_recovered,
+                    delta={'reference': delta_recovered,
+                              'position': 'right',
+                              'valueformat': ',g',
+                              'relative': False,
+
+                              'font': {'size': 15}},
+                    number={'valueformat': ',',
+                            'font': {'size': 20},
+
+                               },
+                    domain={'y': [0, 1], 'x': [0, 1]})],
+            'layout': go.Layout(
+                title={'text': 'New Recovered',
+                       'y': 1,
+                       'x': 0.5,
+                       'xanchor': 'center',
+                       'yanchor': 'top'},
+                font=dict(color='green'),
+                paper_bgcolor='#1f2c56',
+                plot_bgcolor='#1f2c56',
+                height=50
+                ),
+
+            }
+
+#Active
+@app.callback(
+    Output('active', 'figure'),
+    Input('w_countries','value')
+)  
+def update_country(w_countries):
+    #Fomular: total recent recovered - total previous recovered
+    value = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Active'].iloc[-1]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Active'].iloc[-2]
+    #Fomular: total previous recovered - total 2 last days recovered
+    delta = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Active'].iloc[-2]\
+         - covid_data_2[covid_data_2['Country/Region'] == w_countries]['Active'].iloc[-3]
+    
+    return {
+            'data': [go.Indicator(
+                    mode='number+delta',
+                    value=value,
+                    delta={'reference': delta,
+                              'position': 'right',
+                              'valueformat': ',g',
+                              'relative': False,
+
+                              'font': {'size': 15}},
+                    number={'valueformat': ',',
+                            'font': {'size': 20},
+
+                               },
+                    domain={'y': [0, 1], 'x': [0, 1]})],
+            'layout': go.Layout(
+                title={'text': 'New Active',
+                       'y': 1,
+                       'x': 0.5,
+                       'xanchor': 'center',
+                       'yanchor': 'top'},
+                font=dict(color='#e55467'),
+                paper_bgcolor='#1f2c56',
+                plot_bgcolor='#1f2c56',
+                height=50
+                ),
+            }
+
+# Create pie chart (total casualties)
+@app.callback(
+        Output('pie_chart', 'figure'),
+        [Input('w_countries', 'value')]
+)
+def update_graph(w_countries):
+    new_confirmed = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Confirmed'].iloc[-1]
+    new_death = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Deaths'].iloc[-1]
+    new_recovered = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Recovered'].iloc[-1]
+    new_active = covid_data_2[covid_data_2['Country/Region'] == w_countries]['Active'].iloc[-1]
+    colors = ['orange', '#dd1e35', 'green', '#e55467']
+
+    return {
+        'data':[go.Pie(labels=['Confirmed', 'Death', 'Recovered', 'Active'],
+                       values=[new_confirmed, new_death, new_recovered, new_active],
+                       marker=dict(colors=colors),
+                       hoverinfo='label+value+marker',
+                       textinfo='label+value',
+                       textfont=dict(size=13),
+                       hole=.7,
+                       rotation=45)],
+        'layout': go.Layout(
+            # width=800,
+            # height=520,
+            plot_bgcolor='#1f2c56',
+            paper_bgcolor='#1f2c56',
+            hovermode='closest',
+            title={
+                'text': 'Total Cases : ' + (w_countries),
+
+
+                'y': 0.93,
+                'x': 0.5,
+                'xanchor': 'center',
+                'yanchor': 'top'},
+            titlefont={
+                       'color': 'white',
+                       'size': 20},
+            legend={
+                'orientation': 'h',
+                'bgcolor': '#1f2c56',
+                'xanchor': 'center', 'x': 0.5, 'y': -0.07},
+            font=dict(
+                family="sans-serif",
+                size=12,
+                color='white')
+            ),
+    }
+    
 # Deploy web
 if __name__ == '__main__':
     app.run_server()
